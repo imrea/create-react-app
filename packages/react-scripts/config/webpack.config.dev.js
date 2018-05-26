@@ -80,7 +80,7 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: ['node_modules', paths.appNodeModules, paths.appSrc].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -104,6 +104,9 @@ module.exports = {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
+      images: path.resolve(paths.appAssets, 'images'),
+      fonts: path.resolve(paths.appAssets, 'fonts'),
+      styles: path.resolve(paths.appAssets, 'styles'),
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -182,13 +185,14 @@ module.exports = {
           // In production, we use a plugin to extract that CSS to a file, but
           // in development "style" loader enables hot editing of CSS.
           {
-            test: /\.css$/,
+            test: /\.(css|scss|sass)$/,
             use: [
               require.resolve('style-loader'),
               {
                 loader: require.resolve('css-loader'),
                 options: {
-                  importLoaders: 1,
+                  importLoaders: 2,
+                  sourceMap: true,
                 },
               },
               {
@@ -209,6 +213,14 @@ module.exports = {
                       flexbox: 'no-2009',
                     }),
                   ],
+                  sourceMap: true,
+                },
+              },
+              {
+                loader: require.resolve('sass-loader'),
+                options: {
+                  includePaths: [paths.appNodeModules],
+                  sourceMap: true,
                 },
               },
             ],
